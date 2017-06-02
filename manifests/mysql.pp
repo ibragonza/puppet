@@ -1,21 +1,49 @@
-exec { 'apt-update':
-	command => '/usr/bin/apt-get update'
+#exec { 'apt-update':
+#	command => '/usr/bin/apt-get update'
+#}
+
+#package { 'mysql-server':
+#	require => Exec['apt-update'],
+#	ensure => installed,
+#}
+
+
+class twspeeds::db {
+    mysqldb { "twspeeds":
+        user => "twspeeds_admin",
+        password => "testing_only",
+    }
 }
 
-package { 'mysql-server':
-	require => Exec['apt-update'],
-	ensure => installed,
+
+define mysqldb( $user, $password ) {
+    exec { "create-${name}-db":
+      unless => "/usr/bin/mysql -u${user} -p${password} ${name}",
+      command => "/usr/bin/mysql -uroot -p$mysql_password -e \"create database ${name}; grant all on ${name}.* to ${user}@localhost identified by '$password';\"",
+      require => Service["mysqld"],
+    }
 }
 
 
 
 class { '::mysql::server':
-    root_password    => 'testing_pass',
-    override_options => {
-        'mysqld' => {
-            'max_connections'   => '1024',
-            'key_buffer_size'   => '512M'       
-        }       
-    }   
+	package { "mysql-server": ensure => installed }
+  	package { "mysql": ensure => installed }
+
+  	service { "mysqld":
+    		enable => true,
+    		ensure => running,
+    		require => Package["mysql-server"],
+  	}
+
+
+ 	root_password    => 'testing_pass',
+    	override_options => {
+        	'mysqld' => {
+            		'max_connections'   => '1024',
+            		'key_buffer_size'   => '512M'       
+        	}       
+    	}   
+	include twspeeds::db
 }
  
