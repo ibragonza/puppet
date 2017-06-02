@@ -29,7 +29,7 @@ define mysqldb( $user, $password ) {
 class mysql::server {
 	package { "mysql-server": ensure => installed }
   	package { "mysql": ensure => installed }
-
+	root_password => 'testing',
 	include twspeeds::db
 
   	service { "mysqld":
