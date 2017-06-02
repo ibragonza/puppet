@@ -26,24 +26,16 @@ define mysqldb( $user, $password ) {
 
 
 
-class { '::mysql::server':
+class mysql::server {
 	package { "mysql-server": ensure => installed }
   	package { "mysql": ensure => installed }
+
+	include twspeeds::db
 
   	service { "mysqld":
     		enable => true,
     		ensure => running,
-    		require => Package["mysql-server"],
+    		require => Package["mysql-server"]
   	}
-
-
- 	root_password    => 'testing_pass',
-    	override_options => {
-        	'mysqld' => {
-            		'max_connections'   => '1024',
-            		'key_buffer_size'   => '512M'       
-        	}       
-    	}   
-	include twspeeds::db
 }
  
