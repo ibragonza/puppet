@@ -1,21 +1,3 @@
-#exec { 'apt-update':
-#	command => '/usr/bin/apt-get update'
-#}
-
-#package { 'mysql-server':
-#	require => Exec['apt-update'],
-#	ensure => installed,
-#}
-
-
-class twspeeds::db {
-    mysqldb { "twspeeds":
-        user => "twspeeds_admin",
-        password => "testing_only",
-    }
-}
-
-
 define mysqldb( $user, $password ) {
     exec { "create-${name}-db":
       unless => "/usr/bin/mysql -u${user} -p${password} ${name}",
@@ -25,17 +7,25 @@ define mysqldb( $user, $password ) {
 }
 
 
+class twspeeds::db {
+    mysqldb { "twspeeds":
+      user => "twspeeds_admin",
+      password => "testing_only",
+    }
+}
 
-class mysql::server {
-	package { "mysql-server": ensure => installed }
-  	package { "mysql": ensure => installed }
-	root_password => 'testing',
-	include twspeeds::db
 
-  	service { "mysqld":
-    		enable => true,
-    		ensure => running,
-    		require => Package["mysql-server"]
-  	}
+class xxx {
+    package { "mysql-server": ensure => installed }
+    package { "mysql": ensure => installed }
+    service { "mysqld":
+      enable => true,
+      ensure => running,
+      require => Package["mysql-server"]
+    }
+
+    include twspeeds::db
+
 }
  
+class { 'xxx':}
