@@ -1,6 +1,6 @@
-define mysqldb_db( $user, $password ) {
+define mysqldb_db( $db_name ) {
     exec { "create-${name}-db":
-      command => "/usr/bin/mysql -uroot -p$mysql_password -e \"create database ${name};\"",
+      command => "/usr/bin/mysql -uroot -p$mysql_password -e \"create database ${db_name};\"",
       require => Service["mysql"],
     }
 }
@@ -14,9 +14,8 @@ define mysqldb_user( $user, $password ) {
 }
 
 class twspeeds::db {
-    mysqldb_db { "twspeeds":
-      user => "twspeeds_admin",
-      password => "testing_only",
+    mysqldb_db { "twspeeds" : 
+      db_name => "Test DB",
     }
     mysqldb_user { "twspeeds":
       user => "twspeeds_admin",
